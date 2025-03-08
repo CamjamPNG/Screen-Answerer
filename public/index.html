@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ai Assistant For Tests</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <style>
+        :root {
+            --primary-color: #f8f9fa;
+            --secondary-color: #1a1f2b;
+            --accent-color: #6200ee;
+            --text-color: #f8f9fa;
+            --background-color: #1a1a2e;
+            --card-color: #2d2d42;
+            --border-color: #3f3f5f;
+            --success-color: #bb86fc;
+            --warning-color: #ffb74d;
+            --error-color: #ff5252;
+        }
+
+        .light-theme {
+            --primary-color: #1a1f2b;
+            --secondary-color: #f8f9fa;
+            --accent-color: #6200ee;
+            --text-color: #1a1f2b;
+            --background-color: #f8f9fa;
+            --card-color: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-toggle, .settings-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-color);
+            padding: 5px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .theme-toggle:hover, .settings-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .settings-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .settings-tab {
+            background: none;
+            border: none;
+            padding: 8px 16px;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0.7;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .settings-tab::after {
+            content: '';
+            position: absolute;
+            bottom: -11px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent-color);
+            transform: scaleX(0);
+            transition: transform 0.2s ease;
+        }
+
+        .settings-tab.active {
+            opacity: 1;
+        }
+
+        .settings-tab.active::after {
+            transform: scaleX(1);
+        }
+
+        .settings-panel {
+            display: none;
+        }
+
+        .settings-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .settings-description {
+            color: #a0aec0;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .settings-content {
+            background-color: var(--card-color);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .settings-header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .close-settings {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .settings-section {
+            margin-bottom: 20px;
+        }
+
+        .settings-section h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .api-key-help {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .api-key-help ol {
+            margin: 10px 0 10px 20px;
+        }
+
+        .api-key-help li {
+            margin: 5px 0;
+        }
+
+        .api-key-help a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        .api-key-help a:hover {
+            text-decoration: underline;
+        }
+
+        .api-key-warning {
+            margin-top: 10px;
+            color: var(--warning-color);
+            font-weight: 500;
+        }
+
+        .api-key-status {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .api-key-status.success {
+            display: block;
+            background-color: rgba(87, 242, 135, 0.1);
+            color: #57f287;
+        }
+
+        .api-key-status.error {
+            display: block;
+            background-color: rgba(255, 82, 82, 0.1);
+            color: var(--error-color);
+        }
+        
+        .api-key-input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: inherit;
+            margin-bottom: 10px;
+        }
+
+        .theme-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-option {
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-option.active {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        .model-selection {
+            margin-top: 15px;
+        }
+
+        .model-slider-container {
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        .model-slider {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            background: var(--border-color);
+            outline: none;
+            border-radius: 2px;
+            margin: 10px 0;
+        }
+
+        .model-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .model-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .model-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        .selected-model {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--accent-color);
+            font-family: monospace;
+        }
+
+        .save-settings {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .save-settings:hover {
+            background-color: #5000c1;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        h2 {
+            font-weight: 600;
+            margin-bottom: 16px;
+            letter-spacing: -0.3px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text-color);
+            padding: 8px 12px;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .card {
+            background-color: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        button {
+            padding: 12px 16px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            background-color: #0062cc;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            background-color: #2d3748;
+            color: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            margin-top: 30px;
+        }
+
+        .answer-card {
+            background-color: var(--card-color);
+            border-left: 4px solid var(--accent-color);
+            color: var(--text-color);
+            padding: 16px 20px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-weight: 500;
+            animation: fadeIn 0.5s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading {
+            text-align: center;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid var(--accent-color);
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-weight: 500;
+            margin-top: 10px;
+            display: none;
+            padding: 12px;
+            border-radius: 4px;
+            background-color: rgba(255, 82, 82, 0.1);
+            border: 1px solid rgba(255, 82, 82, 0.3);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .screenshot-preview {
+            max-width: 100%;
+            border-radius: 4px;
+            margin-top: 16px;
+            display: none;
+            border: 1px solid var(--border-color);
+        }
+        
+        .monitor-controls {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .monitor-button {
+            flex: 1;
+        }
+        
+        .monitor-status {
+            margin: 16px 0;
+            font-weight: 500;
+            padding: 12px 16px;
+            background-color: rgba(0, 120, 255, 0.1);
+            border-radius: 4px;
+            border: 1px solid rgba(0, 120, 255, 0.2);
+        }
+        
+        .monitor-preview {
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: 4px;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .browser-warning {
+            background-color: rgba(255, 183, 77, 0.1);
+            color: var(--warning-color);
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+            border: 1px solid rgba(255, 183, 77, 0.3);
+        }
+
+        .browser-info {
+            margin-bottom: 16px;
+            font-style: normal;
+            color: #a0aec0;
+            font-size: 14px;
+        }
+
+        .answer-display {
+            background-color: var(--card-color);
+            border-left: 4px solid var(--success-color);
+            color: var(--text-color);
+            padding: 16px 20px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-weight: 500;
+            animation: fadeIn 0.5s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .data-card {
+            flex: 1;
+            background-color: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 16px;
+            margin-right: 16px;
+        }
+
+        .data-card:last-child {
+            margin-right: 0;
+        }
+
+        .data-card h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #a0aec0;
+            margin-bottom: 8px;
+        }
+
+        .data-card .value {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            font-size: 14px;
+            color: #a0aec0;
+            text-align: center;
+        }
+
+        .footer-help {
+            margin-top: 8px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Quiz Assistant</h1>
+            <div class="header-controls">
+                <button class="settings-toggle" id="settingsToggle">⚙️</button>
+            </div>
+        </header>
+
+        <div class="settings-modal" id="settingsModal">
+            <div class="settings-content">
+                <div class="settings-header">
+                    <h2>Settings</h2>
+                    <button class="close-settings" id="closeSettings">✕</button>
+                </div>
+                <div class="settings-tabs">
+                    <button class="settings-tab active" data-tab="apiKey">API Key</button>
+                    <button class="settings-tab" data-tab="model">Model</button>
+                    <button class="settings-tab" data-tab="theme">Theme</button>
+                </div>
+                <div class="settings-panel active" id="apiKeyPanel">
+                    <div class="settings-section">
+                        <h3>API Key</h3>
+                        <input type="text" id="apiKeyInput" class="api-key-input" placeholder="Enter your Gemini API Key">
+                        <p class="settings-description">Your API key is stored locally in your browser and never sent to our servers.</p>
+                        <div id="apiKeyStatus" class="api-key-status"></div>
+                        <div class="api-key-help">
+                            <h4>First time setup:</h4>
+                            <ol>
+                                <li>Go to <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a></li>
+                                <li>Create a free API key</li>
+                                <li>Copy and paste it here</li>
+                            </ol>
+                            <p class="api-key-warning">Note: Keep your API key private. Using this app will count against your Gemini API quota.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-panel" id="modelPanel">
+                    <div class="settings-section">
+                        <h3>Model Selection</h3>
+                        <p class="settings-description">Choose the Gemini model to use for answering questions:</p>
+                        <div class="model-selection">
+                            <div class="model-slider-container">
+                                <input type="range" min="0" max="2" value="1" class="model-slider" id="modelSlider">
+                                <div class="model-labels">
+                                    <span>Faster</span>
+                                    <span>Balanced</span>
+                                    <span>Better</span>
+                                </div>
+                                <div class="selected-model" id="selectedModel">gemini-2.0-flash-lite</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-panel" id="themePanel">
+                    <div class="settings-section">
+                        <h3>Theme</h3>
+                        <p class="settings-description">Choose your preferred theme:</p>
+                        <div class="theme-options">
+                            <div class="theme-option active" data-theme="dark">Dark</div>
+                            <div class="theme-option" data-theme="light">Light</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="save-settings" id="saveSettings">Save Settings</button>
+            </div>
+        </div>
+
+        <div id="firstTimeSetup" class="card" style="display: none; border-left: 4px solid var(--warning-color);">
+            <h2>Welcome to Quiz Assistant!</h2>
+            <p>To get started, you need to set up your Google Gemini API key.</p>
+            <p>Click the ⚙️ settings icon in the top right corner to configure your API key.</p>
+            <button id="openSettingsBtn" class="save-settings" style="max-width: 200px; margin-top: 15px;">Open Settings</button>
+        </div>
+
+        <div class="data-section">
+            <div class="data-card">
+                <h3>Status</h3>
+                <div class="value" id="statusValue">Inactive</div>
+            </div>
+            <div class="data-card">
+                <h3>Questions Processed</h3>
+                <div class="value" id="questionsValue">0</div>
+            </div>
+        </div>
+
+        <div class="card" id="answerSection">
+            <div class="input-section">
+                <h2>ANSWER</h2>
+                <div id="currentAnswer" class="answer-display">
+                    <p>No answer detected yet</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="input-section">
+                <h2>Screen Monitor</h2>
+                <p>Automatically monitor your screen for quiz questions and get answers in real-time.</p>
+                
+                <div class="browser-info" id="browserInfo">Detected browser: <span id="browserName"></span></div>
+                <div class="browser-warning" id="browserWarning">For the best experience, please use Chrome or Firefox.</div>
+                
+                <div class="monitor-controls">
+                    <button id="startMonitoring" class="monitor-button">Start Monitoring</button>
+                    <button id="stopMonitoring" class="monitor-button" disabled>Stop Monitoring</button>
+                </div>
+                <div class="monitor-status">
+                    <p id="monitorStatus">Monitoring inactive</p>
+                </div>
+                <div class="monitor-preview">
+                    <img id="monitorPreview" class="screenshot-preview" alt="Monitor preview">
+                </div>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <!-- Answer cards will be inserted here -->
+        </div>
+
+        <div class="footer">
+            <p>Quiz Assistant | Powered by Gemini AI</p>
+            <p class="footer-help">Need help? Click the ⚙️ settings icon to configure your API key.</p>
+        </div>
+    </div>
+
+    <!-- Include the marked library for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Settings modal functionality
+            const settingsToggle = document.getElementById('settingsToggle');
+            const settingsModal = document.getElementById('settingsModal');
+            const closeSettings = document.getElementById('closeSettings');
+            const saveSettings = document.getElementById('saveSettings');
+            const apiKeyInput = document.getElementById('apiKeyInput');
+            const apiKeyStatus = document.getElementById('apiKeyStatus');
+            const modelSlider = document.getElementById('modelSlider');
+            const selectedModel = document.getElementById('selectedModel');
+            const themeOptions = document.querySelectorAll('.theme-option');
+            
+            // Settings tabs functionality
+            const settingsTabs = document.querySelectorAll('.settings-tab');
+            const settingsPanels = document.querySelectorAll('.settings-panel');
+            
+            // Tab switching functionality
+            settingsTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs and panels
+                    settingsTabs.forEach(t => t.classList.remove('active'));
+                    settingsPanels.forEach(p => p.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    
+                    // Show corresponding panel
+                    const panelId = tab.getAttribute('data-tab') + 'Panel';
+                    document.getElementById(panelId).classList.add('active');
+                });
+            });
+            
+            // Ensure first tab is active by default
+            if (settingsTabs.length > 0 && settingsPanels.length > 0) {
+                settingsTabs[0].classList.add('active');
+                settingsPanels[0].classList.add('active');
+            }
+
+            // Open settings modal
+            settingsToggle.addEventListener('click', function() {
+                settingsModal.style.display = 'flex';
+                
+                // Load saved API key if available
+                const savedApiKey = localStorage.getItem('geminiApiKey');
+                if (savedApiKey) {
+                    apiKeyInput.value = savedApiKey;
+                }
+            });
+            
+            // Close settings modal
+            closeSettings.addEventListener('click', function() {
+                settingsModal.style.display = 'none';
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === settingsModal) {
+                    settingsModal.style.display = 'none';
+                }
+            });
+            
+            // Theme selection functionality
+            // Remove duplicate declaration of themeOptions since it's already declared above
+            
+            themeOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Remove active class from all options
+                    themeOptions.forEach(opt => opt.classList.remove('active'));
+                    
+                    // Add active class to clicked option
+                    option.classList.add('active');
+                    
+                    // Apply theme
+                    const theme = option.getAttribute('data-theme');
+                    if (theme === 'light') {
+                        document.body.classList.add('light-theme');
+                    } else {
+                        document.body.classList.remove('light-theme');
+                    }
+                    
+                    // Save theme preference
+                    localStorage.setItem('theme', theme);
+                });
+            });
+            
+            // Initialize theme from saved preference
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            const savedThemeOption = document.querySelector(`.theme-option[data-theme="${savedTheme}"]`);
+            if (savedThemeOption) {
+                savedThemeOption.click();
+            }
+            
+            // Model options
+            const modelOptions = [
+                'gemini-2.0-flash-lite',  // Faster
+                'gemini-2.0-flash',      // Balanced
+                'gemini-2.0-pro'         // Better
+            ];
+            
+            // Model slider change event with improved feedback
+            modelSlider.addEventListener('input', function() {
+                const selectedModelName = modelOptions[this.value];
+                selectedModel.textContent = selectedModelName;
+                
+                // Add visual feedback
+                selectedModel.style.opacity = '0.7';
+                setTimeout(() => {
+                    selectedModel.style.opacity = '1';
+                }, 150);
+            });
+            
+            // Load saved model preference
+            const savedModel = localStorage.getItem('geminiModel');
+            if (savedModel) {
+                const modelIndex = modelOptions.indexOf(savedModel);
+                if (modelIndex !== -1) {
+                    modelSlider.value = modelIndex;
+                    selectedModel.textContent = savedModel;
+                }
+            }
+
+            // Save settings
+            saveSettings.addEventListener('click', async function() {
+                const apiKey = apiKeyInput.value.trim();
+                const apiKeyStatus = document.getElementById('apiKeyStatus');
+                const selectedModelName = modelOptions[modelSlider.value];
+                
+                // Validate API key
+                const validation = validateApiKey(apiKey);
+                if (!validation.valid) {
+                    apiKeyStatus.textContent = validation.message;
+                    apiKeyStatus.className = 'api-key-status error';
+                    return;
+                }
+
+                // Show loading state
+                apiKeyStatus.textContent = 'Validating API key...';
+                apiKeyStatus.className = 'api-key-status';
+                apiKeyStatus.style.display = 'block';
+                apiKeyStatus.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                apiKeyStatus.style.color = 'var(--text-color)';
+                
+                try {
+                    // Save the selected model
+                    localStorage.setItem('geminiModel', selectedModelName);
+
+                    // Test the API key with a simple question
+                    const response = await fetch('/process_question_with_key', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            question: 'Test question',
+                            apiKey: apiKey,
+                            model: selectedModelName
+                        })
+                    });
+
+                    const data = await response.json();
+                    if (response.ok) {
+                        localStorage.setItem('geminiApiKey', apiKey);
+                        apiKeyStatus.textContent = '✅ API key validated and saved successfully! You can now use the application.';
+                        apiKeyStatus.className = 'api-key-status success';
+                        
+                        // Hide the first-time setup message if it's visible
+                        const firstTimeSetup = document.getElementById('firstTimeSetup');
+                        if (firstTimeSetup) {
+                            firstTimeSetup.style.display = 'none';
+                        }
+                        
+                        setTimeout(() => {
+                            settingsModal.style.display = 'none';
+                        }, 2000);
+                    } else {
+                        throw new Error(data.error || 'Failed to validate API key');
+                    }
+                } catch (error) {
+                    apiKeyStatus.textContent = `❌ Error: ${error.message}`;
+                    apiKeyStatus.className = 'api-key-status error';
+                }
+            });
+
+            // Check for saved API key on page load
+            window.addEventListener('load', function() {
+                const savedApiKey = localStorage.getItem('geminiApiKey');
+                const firstTimeSetup = document.getElementById('firstTimeSetup');
+                
+                if (savedApiKey) {
+                    apiKeyInput.value = savedApiKey;
+                    firstTimeSetup.style.display = 'none';
+                } else {
+                    // Show first-time setup guidance instead of automatically opening settings
+                    firstTimeSetup.style.display = 'block';
+                }
+            });
+            
+            // Open settings button in the welcome message
+            const openSettingsBtn = document.getElementById('openSettingsBtn');
+            if (openSettingsBtn) {
+                openSettingsBtn.addEventListener('click', function() {
+                    settingsModal.style.display = 'flex';
+                });
+            }
+            
+            // Theme toggle functionality
+            const body = document.body;
+            const lightTheme = document.querySelector('.theme-option[data-theme="light"]');
+            const darkTheme = document.querySelector('.theme-option[data-theme="dark"]');
+
+            // Apply theme based on saved preference
+            if (localStorage.getItem('theme') === 'light') {
+                body.classList.add('light-theme');
+                lightTheme.classList.add('active');
+                darkTheme.classList.remove('active');
+            } else {
+                darkTheme.classList.add('active');
+                lightTheme.classList.remove('active');
+            }
+
+            // API key validation with improved error handling
+            function validateApiKey(apiKey) {
+                if (!apiKey) {
+                    return { valid: false, message: 'Please enter an API key' };
+                }
+                
+                if (!/^AIza[0-9A-Za-z_-]{35}$/.test(apiKey)) {
+                    return { valid: false, message: 'Invalid API key format' };
+                }
+                
+                return { valid: true };
+            }
+
+            // Browser detection
+            const browserInfo = document.getElementById('browserInfo');
+            const browserName = document.getElementById('browserName');
+            const browserWarning = document.getElementById('browserWarning');
+            
+            // Detect browser
+            function detectBrowser() {
+                const userAgent = navigator.userAgent;
+                let browser = "Unknown";
+                
+                if (userAgent.indexOf("Firefox") > -1) {
+                    browser = "Firefox";
+                } else if (userAgent.indexOf("Chrome") > -1 && userAgent.indexOf("Edge") === -1 && userAgent.indexOf("Edg") === -1) {
+                    browser = "Chrome";
+                } else if (userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Chrome") === -1) {
+                    browser = "Safari";
+                } else if (userAgent.indexOf("Edge") > -1 || userAgent.indexOf("Edg") > -1) {
+                    browser = "Edge";
+                } else if (userAgent.indexOf("MSIE") > -1 || userAgent.indexOf("Trident") > -1) {
+                    browser = "Internet Explorer";
+                }
+                
+                browserName.textContent = browser;
+                
+                // Show warning if not Chrome or Firefox
+                if (browser !== "Chrome" && browser !== "Firefox") {
+                    browserWarning.style.display = "block";
+                }
+                
+                return browser;
+            }
+            
+            const currentBrowser = detectBrowser();
+
+            // Screen monitoring functionality
+            const startMonitoringBtn = document.getElementById('startMonitoring');
+            const stopMonitoringBtn = document.getElementById('stopMonitoring');
+            const monitorStatus = document.getElementById('monitorStatus');
+            const monitorPreview = document.getElementById('monitorPreview');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const errorMessage = document.getElementById('errorMessage');
+            const statusValue = document.getElementById('statusValue');
+            const questionsValue = document.getElementById('questionsValue');
+            
+            let monitoringInterval = null;
+            const MONITORING_INTERVAL = 5000; // Increased from 3000ms to 5000ms to reduce API request frequency
+            let questionsDetected = 0;
+            let lastRequestTime = 0;
+            const MIN_REQUEST_INTERVAL = 5000; // Minimum time between requests
+
+            // Reset counters
+            function resetCounters() {
+                questionsDetected = 0;
+                questionsValue.textContent = '0';
+            }
+
+            // Helper function to check if enough time has passed since last request
+            function canMakeRequest() {
+                const now = Date.now();
+                if (now - lastRequestTime < MIN_REQUEST_INTERVAL) {
+                    return false;
+                }
+                lastRequestTime = now;
+                return true;
+            }
+            
+            startMonitoringBtn.addEventListener('click', function() {
+                // Different options for Firefox vs Chrome
+                const displayMediaOptions = {
+                    video: {
+                        cursor: "always"
+                    },
+                    audio: false
+                };
+                
+                // Firefox requires specific settings
+                if (currentBrowser === "Firefox") {
+                    displayMediaOptions.video.frameRate = 5; // Lower frameRate for Firefox
+                }
+                
+                // Request screen capture permission
+                navigator.mediaDevices.getDisplayMedia(displayMediaOptions)
+                    .then(stream => {
+                        const videoTrack = stream.getVideoTracks()[0];
+                        const videoElement = document.createElement('video');
+                        videoElement.srcObject = stream;
+                        
+                        // Start monitoring when video is ready
+                        videoElement.onloadedmetadata = function() {
+                            videoElement.play();
+                            startScreenMonitoring(videoElement, videoTrack, stream);
+                        };
+                    })
+                    .catch(error => {
+                        showError('Screen capture permission denied: ' + error.message);
+                    });
+            });
+            
+            stopMonitoringBtn.addEventListener('click', function() {
+                stopScreenMonitoring();
+            });
+            
+            // Screen monitoring endpoint for detecting and processing quiz questions
+            function startScreenMonitoring(videoElement, videoTrack, stream) {
+                // Update UI
+                startMonitoringBtn.disabled = true;
+                stopMonitoringBtn.disabled = false;
+                monitorStatus.textContent = 'Monitoring active - watching for quiz questions';
+                statusValue.textContent = 'Active';
+                statusValue.style.color = 'var(--success-color)';
+                
+                // Create canvas for capturing frames
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = videoElement.videoWidth;
+                canvas.height = videoElement.videoHeight;
+                
+                // Start the monitoring interval
+                monitoringInterval = setInterval(() => {
+                    // Draw current video frame to canvas
+                    ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                    
+                    // Convert canvas to blob
+                    canvas.toBlob(blob => {
+                        // Update preview
+                        const imageUrl = URL.createObjectURL(blob);
+                        monitorPreview.src = imageUrl;
+                        monitorPreview.style.display = 'block';
+                        
+                        // Get API key from local storage if available
+                        const apiKey = localStorage.getItem('geminiApiKey');
+                        const selectedModel = localStorage.getItem('geminiModel') || 'gemini-2.0-flash-lite';
+                        const formData = new FormData();
+                        formData.append('image', blob, 'screen-capture.png');
+                        
+                        // Use custom API key if available, otherwise use default endpoint
+                        let endpoint = '/monitor_screen';
+                        if (apiKey) {
+                            endpoint = '/process_question_with_key';
+                            formData.append('apiKey', apiKey);
+                            formData.append('model', selectedModel);
+                        }
+                        
+                        fetch(endpoint, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.json().then(err => {
+                                    throw new Error(err.message || 'Server error');
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // If a quiz question was detected
+                            if ((data.detected || data.answers) && (data.answers || []).length > 0) {
+                                // Display the answers in both sections
+                                results.innerHTML = '';
+                                
+                                // Update the ANSWER section with only the first (most accurate) answer
+                                const currentAnswer = document.getElementById('currentAnswer');
+                                currentAnswer.innerHTML = '';
+                                
+                                const answersArray = data.answers || [];
+                                if (answersArray.length > 0) {
+                                    // Parse Markdown to HTML - only use the first answer
+                                    const parsedAnswer = marked.parse(answersArray[0]);
+                                    
+                                    // Add to the main results section - only the first answer
+                                    const answerCard = document.createElement('div');
+                                    answerCard.className = 'answer-card';
+                                    answerCard.innerHTML = parsedAnswer;
+                                    results.innerHTML = ''; // Clear previous results
+                                    results.appendChild(answerCard);
+                                    
+                                    // Add to the ANSWER section above
+                                    const answerDisplay = document.createElement('div');
+                                    answerDisplay.innerHTML = parsedAnswer;
+                                    currentAnswer.appendChild(answerDisplay);
+                                }
+                                
+                                // Update counters
+                                questionsDetected++;
+                                questionsValue.textContent = questionsDetected;
+                                
+                                // Optionally play a notification sound or flash the UI
+                                monitorStatus.textContent = 'Quiz question detected! Answer displayed above.';
+                            }
+                        })
+                        .catch(error => {
+                            // Handle specific error types
+                            if (error.message.includes('API key')) {
+                                showError('Invalid API key. Please check your API key in settings.');
+                                monitorStatus.textContent = 'Error: Invalid API key';
+                            } else if (error.message.includes('Rate limit')) {
+                                // If rate limited, just log it and continue
+                                console.log('Rate limited, will retry on next interval');
+                            } else if (error.message.includes('quota')) {
+                                showError('API quota exceeded. Please try again later.');
+                                monitorStatus.textContent = 'Error: API quota exceeded';
+                            } else {
+                                console.error('Monitoring error:', error);
+                                monitorStatus.textContent = 'Error processing image';
+                            }
+                        });
+                    }, 'image/png');
+                }, MONITORING_INTERVAL);
+                
+                // Handle track ending (user stops sharing)
+                videoTrack.addEventListener('ended', () => {
+                    stopScreenMonitoring();
+                    stream.getTracks().forEach(track => track.stop());
+                });
+            }
+            
+            function stopScreenMonitoring() {
+                if (monitoringInterval) {
+                    clearInterval(monitoringInterval);
+                    monitoringInterval = null;
+                    
+                    // Update UI
+                    startMonitoringBtn.disabled = false;
+                    stopMonitoringBtn.disabled = true;
+                    monitorStatus.textContent = 'Monitoring stopped';
+                    statusValue.textContent = 'Inactive';
+                    statusValue.style.color = 'var(--text-color)';
+                }
+            }
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
