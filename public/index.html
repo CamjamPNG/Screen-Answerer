@@ -627,11 +627,10 @@
                         <p class="settings-description">Choose the Gemini model to use for answering questions:</p>
                         <div class="model-selection">
                             <div class="model-slider-container">
-                                <input type="range" min="0" max="2" value="1" class="model-slider" id="modelSlider">
+                                <input type="range" min="0" max="1" value="1" class="model-slider" id="modelSlider">
                                 <div class="model-labels">
                                     <span>Faster</span>
                                     <span>Balanced</span>
-                                    <span>Better</span>
                                 </div>
                                 <div class="selected-model" id="selectedModel">gemini-2.0-flash-lite</div>
                             </div>
@@ -809,8 +808,7 @@
             // Model options
             const modelOptions = [
                 'gemini-2.0-flash-lite',  // Faster
-                'gemini-2.0-flash',      // Balanced
-                'gemini-2.0-pro'         // Better
+                'gemini-2.0-flash'       // Balanced
             ];
             
             // Model slider change event with improved feedback

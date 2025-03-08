@@ -51,7 +51,6 @@ Choose between three Gemini AI models based on your needs:
 
 - **Faster** (gemini-2.0-flash-lite): Optimized for speed, best for simple questions
 - **Balanced** (gemini-2.0-flash): Good balance between speed and accuracy
-- **Better** (gemini-2.0-pro): Highest accuracy, but slightly slower response time
 
 ## Usage
 
