@@ -1,6 +1,6 @@
-# Quiz Assistant
+# Screen Answerer
 
-Quiz Assistant is a powerful tool designed to help users identify and answer quiz questions in real-time. Powered by Google's Gemini AI, this application monitors your screen for quiz questions and provides instant answers.
+Screen Answerer is a powerful tool designed to help users identify and answer quiz questions in real-time. Powered by Google's Gemini AI, this application monitors your screen for quiz questions and provides instant answers.
 
 ## Features
 
@@ -35,22 +35,7 @@ Quiz Assistant is a powerful tool designed to help users identify and answer qui
 
 4. Open your browser and navigate to `http://localhost:3000`
 
-## Configuration
-
-### API Key Setup
-
-1. Go to [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Create a free API key
-3. In the Quiz Assistant app, click the ⚙️ settings icon
-4. Paste your API key in the designated field
-5. Click "Save Settings"
-
-### Model Selection
-
-Choose between three Gemini AI models based on your needs:
-
-- **Faster** (gemini-2.0-flash-lite): Optimized for speed, best for simple questions
-- **Balanced** (gemini-2.0-flash): Good balance between speed and accuracy
+5. In the Screen Answerer app, click the ⚙️ settings icon
 
 ## Usage
 

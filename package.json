@@ -1,7 +1,7 @@
 {
-  "name": "quiz-assistant",
+  "name": "screen-answerer",
   "version": "1.0.0",
-  "description": "Backend for Quiz Assistant application that helps identify correct answers to quiz questions",
+  "description": "Backend for Screen Answerer application that helps identify correct answers to quiz questions",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

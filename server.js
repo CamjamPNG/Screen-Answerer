@@ -182,7 +182,7 @@ async function processTextQuestion(question, apiKey, modelName = 'gemini-2.0-fla
     
     // Optimized prompt for faster response - more direct and concise
     const prompt = `Quiz question: "${question}"
-Provide ONLY the correct answer(s). Be extremely concise.`;
+Provide ONLY the correct answer(s). If there are choices, only pick from them. Be extremely concise.`;
     
     // Use the retry wrapper
     const result = await callGeminiAPI(() => model.generateContent(prompt));
@@ -214,7 +214,7 @@ async function processImageQuestion(imagePath, apiKey, modelName = 'gemini-2.0-f
     const imagePart = fileToGenerativePart(imagePath, mimeType);
     
     // Optimized prompt - shorter and more direct for faster processing
-    const prompt = 'Quiz question image. Identify and provide ONLY the correct answer(s). Be extremely concise.';
+    const prompt = 'Quiz question image. Identify and provide ONLY the correct answer(s). If there are choices, only pick from them. Be extremely concise.';
     
     // Use the retry wrapper
     const result = await callGeminiAPI(() => model.generateContent([prompt, imagePart]));
@@ -512,7 +512,7 @@ async function processImageQuestionWithKey(imagePath, customGenAI, modelName = '
     const imagePart = fileToGenerativePart(imagePath, mimeType);
     
     // Optimized prompt - shorter and more direct for faster processing
-    const prompt = 'Quiz question image. Identify and provide ONLY the correct answer(s). Be extremely concise.';
+    const prompt = 'Quiz question image. Identify and provide ONLY the correct answer(s). If there are choices, only pick from them. Be extremely concise.';
     
     // Use the retry wrapper
     const result = await callGeminiAPI(() => model.generateContent([prompt, imagePart]));
@@ -554,7 +554,7 @@ function startServer(port) {
     })
     .on('listening', () => {
       const actualPort = server.address().port;
-      console.log(`Quiz Assistant server running on port ${actualPort}`);
+      console.log(`Screen Answerer server running on port ${actualPort}`);
     });
 }
 
